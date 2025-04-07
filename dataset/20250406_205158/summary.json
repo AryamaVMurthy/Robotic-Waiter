@@ -1,0 +1,10 @@
+{
+    "timestamp": "20250406_205158",
+    "original_image": "download.jpeg",
+    "saved_directory": "dataset\\20250406_205158",
+    "labels_in_grid": [
+        "floor",
+        "table"
+    ],
+    "fixed_points_present": false
+}

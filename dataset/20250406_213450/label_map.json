@@ -1,0 +1,22 @@
+{
+    "floor": 1,
+    "points": {
+        "floor": [
+            [
+                335,
+                473
+            ],
+            [
+                367,
+                502
+            ]
+        ]
+    },
+    "fixed_points": {
+        "floor": []
+    },
+    "negative_points": [],
+    "fixed_point_ids": {
+        "floor": []
+    }
+}
