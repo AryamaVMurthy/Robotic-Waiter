@@ -1,0 +1,17 @@
+# Core ML/Data libraries
+torch>=2.5.1+cu121  # Specify CUDA 12.1 compatible version
+torchvision>=0.16.1+cu121
+torchaudio>=2.5.1+cu121
+numpy
+Pillow
+opencv-python
+matplotlib
+
+# Hugging Face libraries
+huggingface_hub
+transformers>=4.35.0  # Ensure compatibility with SAM models
+accelerate
+
+# Note: tkinter is required for the GUI but is usually part of the standard Python library.
+# If you encounter issues, you might need to install it via your system's package manager
+# (e.g., 'sudo apt-get install python3-tk' on Debian/Ubuntu). 
