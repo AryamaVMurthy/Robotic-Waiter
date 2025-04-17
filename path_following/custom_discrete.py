@@ -70,7 +70,7 @@ except Exception as e: print(f"Error loading calibration data: {e}. Please check
 CM_PER_METER = 100.0
 
 
-DISCRETE_ACTION_DURATION = 200
+DISCRETE_ACTION_DURATION = 100
 POSE_UPDATE_WAIT = 2
 # --- Configuration (Mirrors CTE Server, including tuned values) ---
 # Network
@@ -84,17 +84,18 @@ IP_WEBCAM_URL = "http://192.168.220.245:8080"
 ROBOT_ARUCO_ID = 0
 
 # --- Motor Speed Configuration (PWM 0-255) ---
-MOTOR_FORWARD_SPEED = 255 # Default forward speed (Synced with CTE)
-MOTOR_TURN_SPEED = 200    # Default turning speed (Synced with CTE)
+MOTOR_FORWARD_SPEED = 180 # Default forward speed (Synced with CTE)
+MOTOR_TURN_SPEED = 180    # Default turning speed (Synced with CTE)
 
 # --- Explicit Waypoint Controller Parameters (meters, radians) ---
 # Use values tuned for delay
 ANGLE_THRESHOLD = 0.3  # Radians (~28.6 degrees) - Reverted from 0.80 based on human edit
 WAYPOINT_RADIUS = 0.08 # Meters (4.0 cm) - Keep increased radius for delay tolerance
+FINAL_WAYPOINT_RADIUS = 0.05 # in meters
 
 # A* Planning Parameters (Same as CTE Server)
 OCCUPANCY_GRID_PATH = os.path.abspath(os.path.join(parent_dir, 'working_dataset/grid/labeled_grid.npy'))
-ASTAR_SAFETY_DISTANCE_REAL = 12 # in cm
+ASTAR_SAFETY_DISTANCE_REAL = 10 # in cm
 ASTAR_SAFETY_DISTANCE_CELLS = 0
 if calibration_valid:
     ASTAR_SAFETY_DISTANCE_CELLS = int(round(ASTAR_SAFETY_DISTANCE_REAL  / GRID_CELL_SIZE_CM))
@@ -461,6 +462,9 @@ async def control_loop(client_context):
 
     while True:
         
+        if (current_waypoint_index >= len(current_path_real)):
+            break
+        
         start_time_loop = time.time()
         # Get current smoothed pose (Uses REAL coordinates)
         current_pose_raw, current_pose_px, current_pose_map = get_current_pose_from_camera()
@@ -471,6 +475,15 @@ async def control_loop(client_context):
             current_pose = current_pose_raw
 
             real_coords = current_path_real[current_waypoint_index]
+            if(distance(real_coords, current_path_real[-1]) <= FINAL_WAYPOINT_RADIUS):
+                print("Goal already reached, not doing any more actions")
+                break
+            
+            if(distance(real_coords, current_pose[:2]) <= WAYPOINT_RADIUS):
+                print("Moving on")
+                current_waypoint_index += 1
+                continue
+            
             # DEBUG - Print current pose details
             print(f"\n📍 ROBOT CURRENT POSE:")
             print(f"   Position: ({current_pose[0]:.4f}, {current_pose[1]:.4f}) meters")
@@ -503,11 +516,6 @@ async def control_loop(client_context):
         else:
             await asyncio.sleep(POSE_UPDATE_WAIT)        
             continue
-        
-        dist = distance(real_coords, current_pose[:2])
-        if(dist <= WAYPOINT_RADIUS):
-            print("Goal already reached, not doing any more actions")
-            break
         
         if DIR is not None:
             left_speed = -MOTOR_TURN_SPEED
@@ -672,7 +680,8 @@ async def main():
         current_waypoint_index = 0
     except Exception as e: print(f"Error converting map path to real path: {e}"); return
 
-    
+    print(current_path_real[-1])
+    print(pixel_to_real(goal_xy_pixels[0], goal_xy_pixels[1]))
     print(f"Number of waypoints: {len(current_path_real)}")
     # Initialize Visualizer (Same as CTE)
     visualizer = ServerVisualizer(processed_grid_for_viz, ROBOT_RADIUS * PX_PER_CM * CM_PER_METER)

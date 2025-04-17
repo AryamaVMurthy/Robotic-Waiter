@@ -78,7 +78,7 @@ def point_line_distance(point, start, end):
     den = ((end[1] - start[1])**2 + (end[0] - start[0])**2) ** 0.5
     return num / den
 
-def approx_compress_path(path, epsilon=5.0):
+def approx_compress_path(path, epsilon=0.1):
     """
     Compresses a list of (x, y) points into a simplified version using
     the Ramer-Douglas-Peucker algorithm, with a tolerance epsilon.
@@ -227,7 +227,7 @@ def astar(grid, startt, goalt, safe_dis):
                 i -= 1
                 cx, cy = tuple(came_from[cy, cx])
 
-            simplified_points = approx_compress_path(path,epsilon=5.0)
+            simplified_points = approx_compress_path(path,epsilon=0.1)
             compressed_path = convert_to_segments(simplified_points)
             waypoints = convert_to_waypoints(compressed_path)
 
@@ -268,8 +268,7 @@ def time_astar(grid, start, goal, safe_dis):
 
 def get_waypoints(grid, start, goal, safe_dis):
     path, compressed_path, waypoints, safe_grid = astar(grid, start, goal, safe_dis)
-    waypoints = [(y, x) for x, y in waypoints]
-    print(waypoints)
+    waypoints = [(y, x) for x, y in path]
     return waypoints
 
 import os
