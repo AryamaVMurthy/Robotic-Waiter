@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receiver - Webcam Stream</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Receiver View (Laptop)</h1>
+
+        <div class="peer-id-display">
+            Your Peer ID: <strong id="myPeerId">Waiting...</strong>
+        </div>
+
+        <!-- Area for the QR code -->
+        <div id="connectionInfo" class="qr-code-area" style="display: none;">
+            <p>Scan this QR code with the Sender device:</p>
+            <div id="qrcode"></div> <!-- QR code will be rendered here -->
+            <p><small>(Ensure sender device is on Mobile Data or a non-restrictive Wi-Fi)</small></p>
+        </div>
+
+        <div id="status" class="status-area">Waiting for connection...</div>
+
+        <h2>Incoming Stream</h2>
+        <div class="video-wrapper">
+            <video id="remoteVideo" autoplay playsinline></video>
+        </div>
+        <!-- Add canvas for frame capture -->
+        <canvas id="processingCanvas" width="640" height="480" style="display: none;"></canvas>
+    </div>
+
+    <!-- Include QR Code generation library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <!-- Include PeerJS library -->
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <!-- Include your custom script -->
+    <script src="script.js"></script>
+</body>
+</html> 

@@ -1,0 +1,181 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5;
+    color: #1c1e21;
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #1877f2; /* Facebook blue-ish */
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+}
+
+h2 {
+    color: #333;
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #dddfe2;
+    padding-bottom: 10px;
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 75%; /* 4:3 aspect ratio */
+    background-color: #000;
+    margin: 15px auto;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.video-wrapper video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    object-fit: cover; /* Cover the area, might crop */
+}
+
+.control-area {
+    background-color: #f7f8fa;
+    padding: 15px 20px;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.peer-id-display {
+    font-size: 0.9em;
+    color: #606770;
+    margin-bottom: 15px;
+}
+
+.peer-id-display strong {
+    font-weight: 600;
+    color: #1c1e21;
+    word-break: break-all;
+}
+
+.control-area label {
+    margin-right: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.control-area input[type="text"],
+.control-area select {
+    padding: 8px 12px;
+    margin-right: 10px;
+    border: 1px solid #ccd0d5;
+    border-radius: 6px;
+    font-size: 0.95em;
+    min-width: 150px;
+    margin-bottom: 10px; /* Add spacing on mobile */
+}
+
+.control-area input[readonly] {
+    background-color: #e9ebee;
+    cursor: default;
+}
+
+.control-area button {
+    padding: 8px 20px;
+    cursor: pointer;
+    background-color: #1877f2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.control-area button:hover {
+    background-color: #166fe5;
+}
+
+.status-area {
+    margin-top: 20px;
+    padding: 12px 15px;
+    background-color: #e7f3ff;
+    border: 1px solid #cfe2ff;
+    color: #084298;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* QR Code Specific Styles */
+.qr-code-area {
+    background-color: #fff; /* White background for QR */
+}
+
+#qrcode {
+    width: 200px; /* Fixed size for QR code */
+    height: 200px;
+    margin: 15px auto;
+    padding: 10px; /* Padding around the QR code */
+    background-color: #fff;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+}
+
+#qrcode img {
+    display: block;
+    margin: auto;
+    width: 100% !important; /* Ensure image fills the container */
+    height: 100% !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .container {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    .control-area input[type="text"],
+    .control-area select,
+    .control-area button {
+        display: block; /* Stack controls vertically */
+        width: calc(100% - 24px); /* Full width minus padding */
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 12px;
+    }
+
+    .control-area label {
+         display: block; /* Label above control */
+         margin-bottom: 5px;
+    }
+
+    #qrcode {
+        width: 160px;
+        height: 160px;
+    }
+
+    .video-wrapper {
+        padding-bottom: 100%; /* 1:1 aspect ratio on smaller screens */
+    }
+} 

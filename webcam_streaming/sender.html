@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sender - Webcam Stream</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sender View (Mobile Device)</h1>
+
+        <div class="control-area">
+            <p class="peer-id-display">Your Peer ID: <strong id="myPeerId">Waiting...</strong></p>
+            <label for="receiverIdInput">Receiver Peer ID:</label>
+            <input type="text" id="receiverIdInput" placeholder="Loaded from QR Scan" readonly>
+            <button id="startStreamButton">Start & Stream Camera</button>
+        </div>
+
+        <div class="control-area camera-select-area" style="display: none;">
+            <label for="cameraSelect">Select Camera:</label>
+            <select id="cameraSelect"></select>
+        </div>
+
+        <div id="status" class="status-area">Waiting for connection...</div>
+
+        <h2>My Camera Preview (Muted)</h2>
+        <div class="video-wrapper">
+            <video id="localVideo" autoplay playsinline muted></video>
+        </div>
+    </div>
+
+    <!-- Include PeerJS library -->
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <!-- Include your custom script -->
+    <script src="script.js"></script>
+</body>
+</html> 
