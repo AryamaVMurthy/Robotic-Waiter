@@ -173,7 +173,7 @@ def visualize_waypoints(grid, waypoints):
     plt.title("Waypoints")
     plt.show()
 
-def astar(grid, start, goal, safe_dis):
+def astar(grid, startt, goalt, safe_dis):
     """
     A* search on a grid with safe-distance enforcement.
     grid: 2D numpy array where allowed cells are 1 and obstacles 0.
@@ -185,6 +185,8 @@ def astar(grid, start, goal, safe_dis):
       path: list of (x, y) tuples from start to goal (empty list if no path exists).
       safe_grid: the preprocessed grid where cells within safe_dis of an obstacle are blocked.
     """
+    start = startt[1], startt[0]
+    goal = goalt[1], goalt[0]
     rows, cols = grid.shape
     
     # Compute safe grid using distance transform.
