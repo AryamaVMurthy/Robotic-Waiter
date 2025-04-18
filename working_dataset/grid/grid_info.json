@@ -1,0 +1,126 @@
+{
+  "grid_path": "grid\\labeled_grid.npy",
+  "grid_vis_path": "grid\\labeled_grid_vis.png",
+  "mask_paths": {
+    "floor": "masks\\mask_floor.npy"
+  },
+  "mask_vis_paths": {
+    "floor": "masks\\mask_floor_vis.png"
+  },
+  "label_map": {
+    "floor": 1,
+    "points": {
+      "floor": [
+        [
+          568,
+          115
+        ],
+        [
+          445,
+          222
+        ],
+        [
+          326,
+          261
+        ],
+        [
+          113,
+          404
+        ],
+        [
+          106,
+          496
+        ],
+        [
+          286,
+          574
+        ],
+        [
+          427,
+          471
+        ],
+        [
+          339,
+          399
+        ],
+        [
+          628,
+          254
+        ],
+        [
+          659,
+          169
+        ],
+        [
+          483,
+          298
+        ],
+        [
+          604,
+          442
+        ],
+        [
+          514,
+          422
+        ],
+        [
+          637,
+          637
+        ],
+        [
+          429,
+          579
+        ],
+        [
+          505,
+          578
+        ],
+        [
+          729,
+          672
+        ]
+      ]
+    },
+    "fixed_points": {
+      "floor": []
+    },
+    "fixed_point_ids": {
+      "floor": []
+    },
+    "negative_points": [],
+    "_calibration_": {
+      "pixels_per_cm": 3.2215524208058453,
+      "cm_per_pixel": 0.3104093521935794,
+      "calibration_points": [
+        [
+          617,
+          178
+        ],
+        [
+          612,
+          339
+        ]
+      ],
+      "calibration_distance_cm": 50.0
+    },
+    "_grid_settings_": {
+      "grid_size_cm": 0.5,
+      "grid_size_pixels": 1.6107762104029226,
+      "grid_cols": 795,
+      "grid_rows": 447
+    }
+  },
+  "resolution": {
+    "height": 720,
+    "width": 1280
+  },
+  "timestamp": "20250418_194450",
+  "original_image_path": "original_image.png",
+  "selected_labels": [
+    "floor"
+  ],
+  "timing": {
+    "grid_save_time": 0.4948556423187256,
+    "total_save_time": 4.102414608001709
+  }
+}

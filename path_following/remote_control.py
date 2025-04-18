@@ -8,7 +8,7 @@ from functools import partial
 import threading
 
 # Change this to your ESP32's IP address
-ESP_IP = "192.168.137.120"
+ESP_IP = "192.168.25.216"
 
 class RobotControlGUI:
     def __init__(self, root, coap_loop):

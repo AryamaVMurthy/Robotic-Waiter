@@ -580,7 +580,8 @@ class SAM2SegmentationTool:
         if "fixed_points" not in self.label_map:
             return
 
-        cmap = plt.cm.get_cmap('tab10', max(10, len(self.labels)))
+        # Fixed DeprecationWarning: Use plt.get_cmap instead of plt.cm.get_cmap
+        cmap = plt.get_cmap('tab10', max(10, len(self.labels)))
 
         for i, label in enumerate(self.labels):
             if label in self.label_map.get("fixed_points", {}) and self.label_map["fixed_points"][label]:
@@ -680,17 +681,20 @@ class SAM2SegmentationTool:
             hf_model_name = "facebook/sam2-hiera-tiny"
 
             self.update_status(f"Loading Predictor {hf_model_name}...")
-            # Load the predictor directly
-            self.predictor = SAM2ImagePredictor.from_pretrained(hf_model_name)
+            # Load the predictor directly, passing the selected device
+            # This should ensure the underlying build_sam2 uses the correct device
+            self.predictor = SAM2ImagePredictor.from_pretrained(hf_model_name, device=device)
 
-            # --- Move the predictor's *model* to the selected device ---
-            if hasattr(self.predictor, 'model') and isinstance(self.predictor.model, torch.nn.Module):
-                self.predictor.model.to(device)
-                self.update_status(f"Predictor model moved to device: {device}")
-            else:
-                # Fallback or warning if the model attribute isn't found as expected
-                self.update_status(f"Warning: Could not automatically move predictor model to device {device}. Assuming predictor handles device internally.")
-                print(f"Warning: Predictor object of type {type(self.predictor)} does not have an accessible 'model' attribute for device placement.")
+            # --- Remove the explicit model.to(device) block below ---
+            # It's redundant now that device is passed to from_pretrained
+            # and was likely happening after the internal error anyway.
+            # if hasattr(self.predictor, 'model') and isinstance(self.predictor.model, torch.nn.Module):
+            #     self.predictor.model.to(device)
+            #     self.update_status(f"Predictor model moved to device: {device}")
+            # else:
+            #     # Fallback or warning if the model attribute isn't found as expected
+            #     self.update_status(f"Warning: Could not automatically move predictor model to device {device}. Assuming predictor handles device internally.")
+            #     print(f"Warning: Predictor object of type {type(self.predictor)} does not have an accessible 'model' attribute for device placement.")
             # ---------------------------------------------------------
 
 

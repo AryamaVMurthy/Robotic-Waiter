@@ -1,0 +1,17 @@
+{
+  "timestamp": "20250418_194450",
+  "original_image_path": "original_image.png",
+  "label_map_path": "label_map.json",
+  "mask_paths": {
+    "floor": "masks\\mask_floor.npy"
+  },
+  "grid_path": "grid\\labeled_grid.npy",
+  "grid_vis_path": "grid\\labeled_grid_vis.png",
+  "selected_labels": [
+    "floor"
+  ],
+  "timing": {
+    "grid_save_time": 0.4948556423187256,
+    "total_save_time": 4.102414608001709
+  }
+}
