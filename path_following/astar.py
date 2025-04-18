@@ -1,6 +1,6 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 import cv2
 import heapq
 import time
@@ -176,85 +176,180 @@ def visualize_waypoints(grid, waypoints):
 def astar(grid, startt, goalt, safe_dis):
     """
     A* search on a grid with safe-distance enforcement.
+    Finds path to goal or closest reachable point if goal is unreachable.
     grid: 2D numpy array where allowed cells are 1 and obstacles 0.
-    start: (x, y) tuple for the starting cell.
-    goal: (x, y) tuple for the target cell.
+    startt: (x, y) tuple for the starting cell.
+    goalt: (x, y) tuple for the target cell.
     safe_dis: Minimum safe distance from obstacles.
-    
-    Returns a tuple: (path, safe_grid)
-      path: list of (x, y) tuples from start to goal (empty list if no path exists).
-      safe_grid: the preprocessed grid where cells within safe_dis of an obstacle are blocked.
+
+    Returns a tuple: (path, compressed_path, waypoints, safe_grid)
+      path: list of (x, y) tuples from start to goal/closest node.
+      compressed_path: Simplified segments of the path.
+      waypoints: Waypoints derived from the compressed path.
+      safe_grid: the preprocessed grid.
     """
-    start = startt[1], startt[0]
-    goal = goalt[1], goalt[0]
+    # Ensure inputs are tuples and use (x, y) consistently internally
+    start = (startt[1],startt[0])
+    goal = (goalt[1],goalt[0])
     rows, cols = grid.shape
-    
+
     # Compute safe grid using distance transform.
     safe_grid = compute_safe_grid(grid, safe_dis)
 
-    # If start or goal are unsafe, we cannot find a path.
-    if safe_grid[start[1], start[0]] == 0 or safe_grid[goal[1], goal[0]] == 0:
-        return [], [], [], safe_grid  # Modified return to include waypoints
+    # Check if start node is valid
+    # NumPy indexing uses [row, col] which corresponds to [y, x]
+    if not (0 <= start[1] < rows and 0 <= start[0] < cols and safe_grid[start[1], start[0]] == 1):
+         print(f"Start node {start} is outside grid bounds or unsafe.")
+         return [], [], [], safe_grid
+
+    # Check if goal node is valid initially (optional, could be unreachable later)
+    goal_is_initially_safe = (0 <= goal[1] < rows and 0 <= goal[0] < cols and safe_grid[goal[1], goal[0]] == 1)
+    if not goal_is_initially_safe:
+         print(f"Warning: Goal node {goal} is outside grid bounds or initially unsafe.")
+         # We will still proceed to find the closest reachable point.
 
     # Initialize the cost arrays.
     g_cost = np.full((rows, cols), np.inf, dtype=np.float32)
+    # Use [y, x] for numpy indexing
     g_cost[start[1], start[0]] = 0
 
     # Parent pointer array: store (prev_x, prev_y) for each cell.
     came_from = np.full((rows, cols, 2), -1, dtype=np.int32)
 
+    # --- Modification Start: Track closest node ---
+    min_h_to_goal = heuristic(start, goal) # Heuristic needs (x,y) tuples
+    closest_node_to_goal = start
+    # --- Modification End ---
+
     # Open set as a priority queue. Each item is (f_cost, (x, y)).
     open_set = []
-    heapq.heappush(open_set, (heuristic(start, goal), start))
+    # Push (f_cost, (x, y)) onto heap
+    heapq.heappush(open_set, (min_h_to_goal, start)) # f_cost = g_cost (0) + h_cost
+
     iter = 0
+    goal_found = False
+    final_target_node = None
+
+    # Neighbors are defined as (dx, dy)
     neighbors = ((-1, 0), (1, 0), (0, -1), (0, 1))
 
     while open_set:
         iter += 1
-        current_f, current = heapq.heappop(open_set)
+        current_f, current = heapq.heappop(open_set) # current is (x, y)
+
+        # Optimization: If we already found a path to this node with lower cost, skip
+        # Check g_cost using [y, x] indexing
+        if current_f > g_cost[current[1], current[0]] + heuristic(current, goal):
+             continue # Skip if a better path to 'current' was already found and processed
+
+        # --- Modification Start: Update closest node ---
+        current_h = heuristic(current, goal)
+        # Update if this node is heuristically closer to the goal than any node seen so far.
+        # Ensure the node was actually reached (g_cost is finite) - implicit by being popped.
+        if current_h < min_h_to_goal:
+            min_h_to_goal = current_h
+            closest_node_to_goal = current
+        # --- Modification End ---
+
+        # Check if we reached the *original* goal
         if current == goal:
-            print(f"Iter = {iter}")
+            print(f"Goal {goal} reached! Iter = {iter}")
+            final_target_node = goal
+            goal_found = True
+            break # Exit loop successfully
 
-            # Reconstruct path from goal to start using came_from.
-            length = int(g_cost[goal[1], goal[0]]) + 1
-            path = [None] * length
-
-            # Fill the path list in reverse order.
-            i = length - 1
-            cx, cy = goal
-            while (cx, cy) != (-1, -1) and i >= 0:
-                path[i] = (cx, cy)
-                i -= 1
-                cx, cy = tuple(came_from[cy, cx])
-
-            simplified_points = approx_compress_path(path,epsilon=0.1)
-            compressed_path = convert_to_segments(simplified_points)
-            waypoints = convert_to_waypoints(compressed_path)
-
-            print("Path lengths")
-            print(f"Original: {len(path)}")
-            print(f"Compressed: {len(compressed_path)}")
-            print(f"Waypoints: {len(waypoints)}")
-
-            return path, compressed_path, waypoints, safe_grid
-
+        # Current node coordinates (x, y)
         x, y = current
         # Explore the 4-connected neighbors (up, down, left, right).
         for dx, dy in neighbors:
             nx, ny = x + dx, y + dy
+            neighbor = (nx, ny)
+
             # Check bounds.
             if 0 <= nx < cols and 0 <= ny < rows:
-                # Only consider safe cells.
+                # Only consider safe cells (use [y, x] for numpy access).
                 if safe_grid[ny, nx] == 1:
-                    tentative_g = g_cost[y, x] + 1  # uniform cost (1 per step)
+                    tentative_g = g_cost[y, x] + 1 # uniform cost (1 per step)
+
+                    # Check if this path to neighbor is better than any previous one
+                    # Access g_cost using [y, x] indexing
                     if tentative_g < g_cost[ny, nx]:
                         g_cost[ny, nx] = tentative_g
-                        came_from[ny, nx] = (x, y)
-                        f_cost = tentative_g + heuristic((nx, ny), goal)
-                        heapq.heappush(open_set, (f_cost, (nx, ny)))
-                        
-    # If we exit the loop, no path was found.
-    return [], [], [], safe_grid  # Modified return to include waypoints
+                        # Store parent as (x, y)
+                        came_from[ny, nx] = current # Store the current node (x, y) as parent
+                        # Calculate f_cost for priority queue
+                        f_cost = tentative_g + heuristic(neighbor, goal) # Heuristic needs (x,y)
+                        heapq.heappush(open_set, (f_cost, neighbor)) # Push neighbor (x,y)
+
+    # --- Loop finished ---
+
+    if goal_found:
+        target_node = final_target_node
+        print(f"Path reconstruction target: Original Goal {target_node}")
+    elif closest_node_to_goal is not None:
+        # If goal wasn't found, use the closest node identified during search
+        target_node = closest_node_to_goal
+        print(f"Goal {goal} unreachable. Path reconstruction target: Closest Node {target_node}")
+    else:
+        # This case should ideally not be reached if start is valid.
+        print(f"Goal {goal} unreachable, and no closest node found (start node might be isolated?).")
+        return [], [], [], safe_grid
+
+
+    # --- Reconstruct path from target_node to start using came_from ---
+    path = []
+    # Start reconstruction from the determined target node (x, y)
+    cx, cy = target_node
+    while (cx, cy) != (-1, -1): # Stop when we trace back past the start node
+        # Check if the current node in reconstruction was actually reached
+        # Use [y, x] for g_cost access
+        if math.isinf(g_cost[cy, cx]) and (cx, cy) != start:
+             print(f"Error during path reconstruction: Node {(cx, cy)} has infinite g_cost.")
+             # Decide fallback: Return empty path or path up to this point?
+             # Let's return empty path for safety.
+             return [], [], [], safe_grid
+
+        # Add the current node (x, y) to the path
+        path.append((cx, cy))
+
+        # Get the parent (px, py) using [y, x] indexing for came_from
+        px, py = tuple(came_from[cy, cx])
+
+        # If the parent is (-1, -1), it means we've reached the start node's marker
+        if (px, py) == (-1, -1):
+            # Ensure start node is in the path if it wasn't the target itself
+            if (cx,cy) != start:
+                 # This check might be redundant depending on exact came_from init
+                 pass
+            break
+
+        # Move to the parent node for the next iteration
+        cx, cy = px, py
+
+        # Safety break
+        if len(path) > rows * cols:
+            print("Error: Path reconstruction exceeded maximum possible length.")
+            return [], [], [], safe_grid
+
+    if not path:
+        print("Path reconstruction failed.")
+        return [], [], [], safe_grid
+
+    path.reverse() # Reverse the path to go from start -> target
+
+    # --- Path Post-Processing (Using your existing functions) ---
+    # Ensure these functions correctly handle (x, y) tuples
+    simplified_points = approx_compress_path(path, epsilon=0.1) # Using your specified epsilon
+    compressed_path = convert_to_segments(simplified_points)
+    waypoints = convert_to_waypoints(compressed_path) # Assuming this takes segments
+
+    print("Path lengths (to goal or closest point)")
+    print(f"Original: {len(path)}")
+    print(f"Compressed Segments: {len(compressed_path)}") # Assuming this is what was meant by 'Compressed'
+    print(f"Waypoints: {len(waypoints)}")
+
+    # Return the results in the specified format
+    return path, compressed_path, waypoints, safe_grid
 
 def time_astar(grid, start, goal, safe_dis):
     start_time = time.perf_counter()

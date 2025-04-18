@@ -1,13 +1,13 @@
 {
     "pixel_ratio": {
-        "value": 3.2215524208058453,
+        "value": 7.145491974353869,
         "unit": "pixels/cm"
     },
     "grid": {
-        "columns": 795,
-        "rows": 447,
+        "columns": 537,
+        "rows": 302,
         "cell_size_cm": 0.5,
-        "cell_size_pixels": 1.6107762104029226
+        "cell_size_pixels": 3.5727459871769347
     },
     "aruco": {
         "marker_size": 0.086

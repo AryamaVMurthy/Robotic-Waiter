@@ -71,14 +71,14 @@ CM_PER_METER = 100.0
 
 
 DISCRETE_ACTION_DURATION = 100
-POSE_UPDATE_WAIT = 2
+POSE_UPDATE_WAIT = 1
 # --- Configuration (Mirrors CTE Server, including tuned values) ---
 # Network
-SERVER_IP = '192.168.220.209' # Your PC's IP
+SERVER_IP = '192.168.25.81' # Your PC's IP
 SERVER_PORT = 5683
-ESP32_IP = '192.168.220.216' # Set ESP32 IP directly
+ESP32_IP = '192.168.25.216' # Set ESP32 IP directly
 CONTROL_LOOP_DELAY = 0.01
-IP_WEBCAM_URL = "http://192.168.220.245:8080"
+IP_WEBCAM_URL = "http://192.168.25.173:8080"
 
 # Robot Identification
 ROBOT_ARUCO_ID = 0

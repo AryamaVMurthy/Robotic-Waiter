@@ -46,7 +46,7 @@ except ImportError:
         return angle
 
 # --- Configuration (Match your server scripts) ---
-IP_WEBCAM_URL = "http://192.0.0.4:8080" # Make sure this matches your setup
+IP_WEBCAM_URL = "http://192.168.25.173:8080" # Make sure this matches your setup
 ROBOT_ARUCO_ID = 0 # The ID of the marker on your robot
 
 # Paths for calibration/camera info
